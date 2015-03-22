@@ -29,8 +29,8 @@ describe('Node e-commerce scraper', function () {
         scraper.get(url, options, function (err, data, $) {
             data.should.be.ok;
 
-            // data.images.should.be.an.Array;
-            // data.images.length.should.be(4);
+            data.images.should.be.an.Array;
+            data.images.length.should.be.eql(4);
 
             data.name.should.be.a.String;
             data.name.should.be.eql('Camiseta Lee Vermelha');

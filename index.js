@@ -3,6 +3,11 @@ var cheerio = require('cheerio');
 var _ = require('lodash');
 
 var Scraper = function () {
+    /*
+     * TODOs:
+     * Get currency and decimal mark by parameters.
+    */
+
     this.currency = 'R$';
     this.decimalMark = ',';
 };
@@ -35,6 +40,8 @@ Scraper.prototype = {
 
     getProductData: function (url, attributes, callback) {
         var data = {};
+        var curr = this.currency;
+        var decimal = this.decimalMark
 
         this.getHtml(url, function (err, $) {
             if (err) {
@@ -45,30 +52,19 @@ Scraper.prototype = {
             _.each(attributes, function (selector, key) {
                 var $item = $(selector);
 
-                if ($item.is('img')) {
-                    data[key] = $item.attr('src');
+                if ($item.length > 1) {
+                    data[key] = [];
+
+                    _.each($item, function (item) {
+                        data[key].push(
+                            parseProductAttribute($(item), curr, decimal)
+                        );
+                    }.bind(this));
+
                     return;
                 }
 
-                if ($item.is('a')) {
-                    data[key] = $item.attr('href');
-                    return;
-                }
-
-                var text = _.trim($item.html());
-
-                if (text.indexOf(this.currency) != -1) {
-                    var value = text.replace(this.currency, '').replace(this.decimalMark, '.');
-                    data[key] = parseFloat(value);
-                    return;
-                }
-
-                if (isNaN(text)) {
-                    data[key] = text;
-                    return;
-                }
-
-                data[key] = parseFloat(text);
+                data[key] = parseProductAttribute($item, curr, decimal);
             }.bind(this));
 
             callback(null, data, $);
@@ -77,4 +73,29 @@ Scraper.prototype = {
 
 };
 
+// Private functions
+var parseProductAttribute = function ($item, currency, decimalMark) {
+    if ($item.is('img')) {
+        return $item.attr('src');
+    }
+
+    if ($item.is('a')) {
+        return $item.attr('href');
+    }
+
+    var text = _.trim($item.html());
+
+    if (text.indexOf(currency) != -1) {
+        var value = text.replace(currency, '').replace(decimalMark, '.');
+        return parseFloat(value);
+    }
+
+    if (isNaN(text)) {
+        return text;
+    }
+
+    return parseFloat(text);
+};
+
+// Expose Scraper module
 exports = module.exports = new Scraper();
