@@ -20,19 +20,22 @@ describe('Node e-commerce scraper', function () {
         var url = 'http://www.dafiti.com.br/Camiseta-Lee-Vermelha-1680307.html';
 
         var options = {
-            images: '#gallery .gallery-preview img.gallery-preview-img',
+            images: '#gallery .carousel-item > a',
             name: 'h1.product-name',
+            description: 'p.product-information-description',
             price: '.catalog-detail-full-price .catalog-detail-price-value'
         };
 
         scraper.get(url, options, function (err, data, $) {
             data.should.be.ok;
 
-            data.images.should.be.an.Array;
-            data.images.length.should.be(4);
+            // data.images.should.be.an.Array;
+            // data.images.length.should.be(4);
 
             data.name.should.be.a.String;
             data.name.should.be.eql('Camiseta Lee Vermelha');
+
+            data.description.should.be.a.String;
 
             data.price.should.be.a.Number;
             data.price.should.be.eql(119);
