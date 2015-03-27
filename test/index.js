@@ -45,4 +45,39 @@ describe('Node e-commerce scraper', function () {
 
     });
 
+    it('should work with objects and selector strings', function (done) {
+
+        var url = 'http://www.zattini.com.br/produto/sapatenis-polo-hpc-190-D93-0005-010';
+
+        var options = {
+            images: {
+                selector: '#gallery .carousel-item > a',
+                attribute: 'data-zoom'
+            },
+            name: 'h1.base-title',
+            description: 'div.product-description',
+            price: '.product-info-holder [itemprop="price"]'
+        };
+
+        scraper.get(url, options, function (err, data, $) {
+            console.log(data);
+
+            data.should.be.ok;
+
+            data.images.should.be.an.Array;
+            data.images.length.should.be.eql(5);
+
+            data.name.should.be.a.String;
+            data.name.should.be.eql('Sapatênis Polo HPC 190');
+
+            data.description.should.be.a.String;
+
+            data.price.should.be.a.Number;
+            data.price.should.be.eql(239.9);
+
+            done();
+        });
+
+    });
+
 });
