@@ -51,7 +51,7 @@ describe('Node e-commerce scraper', function () {
 
         var options = {
             images: {
-                selector: '#gallery .carousel-item > a',
+                selector: '.photo-gallery-wrapper ul.photo-gallery-list li a[data-zoom]',
                 attribute: 'data-zoom'
             },
             name: 'h1.base-title',
@@ -60,15 +60,13 @@ describe('Node e-commerce scraper', function () {
         };
 
         scraper.get(url, options, function (err, data, $) {
-            console.log(data);
-
             data.should.be.ok;
 
             data.images.should.be.an.Array;
             data.images.length.should.be.eql(5);
 
             data.name.should.be.a.String;
-            data.name.should.be.eql('Sapatênis Polo HPC 190');
+            data.name.should.be.eql('Sapat&#xEA;nis Polo HPC 190');
 
             data.description.should.be.a.String;
 

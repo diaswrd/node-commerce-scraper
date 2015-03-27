@@ -38,7 +38,7 @@ Scraper.prototype = {
         });
     },
 
-    getProductData: function (url, attributes, callback) {
+    getProductData: function (url, options, callback) {
         var data = {};
         var curr = this.currency;
         var decimal = this.decimalMark
@@ -49,7 +49,15 @@ Scraper.prototype = {
                 return;
             }
 
-            _.each(attributes, function (selector, key) {
+            _.each(options, function (o, key) {
+                var attribute = null;
+                var selector = o;
+
+                if (_.isObject(o)) {
+                    attribute = o.attribute;
+                    selector = o.selector;
+                }
+
                 var $item = $(selector);
 
                 if ($item.length > 1) {
@@ -57,14 +65,14 @@ Scraper.prototype = {
 
                     _.each($item, function (item) {
                         data[key].push(
-                            parseProductAttribute($(item), curr, decimal)
+                            parseProductAttribute($(item), attribute, curr, decimal)
                         );
                     }.bind(this));
 
                     return;
                 }
 
-                data[key] = parseProductAttribute($item, curr, decimal);
+                data[key] = parseProductAttribute($item, attribute, curr, decimal);
             }.bind(this));
 
             callback(null, data, $);
@@ -74,7 +82,11 @@ Scraper.prototype = {
 };
 
 // Private functions
-var parseProductAttribute = function ($item, currency, decimalMark) {
+var parseProductAttribute = function ($item, attribute, currency, decimalMark) {
+    if (attribute) {
+        return $item.attr(attribute);
+    }
+
     if ($item.is('img')) {
         return $item.attr('src');
     }
