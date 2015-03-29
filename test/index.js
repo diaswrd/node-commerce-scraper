@@ -23,7 +23,8 @@ describe('Node e-commerce scraper', function () {
             images: '#gallery .carousel-item > a',
             name: 'h1.product-name',
             description: 'p.product-information-description',
-            price: '.catalog-detail-full-price .catalog-detail-price-value'
+            price: '.catalog-detail-full-price .catalog-detail-price-value',
+            installments: '.catalog-detail-price-installment-value'
         };
 
         scraper.get(url, options, function (err, data, $) {
@@ -39,6 +40,8 @@ describe('Node e-commerce scraper', function () {
 
             data.price.should.be.a.Number;
             data.price.should.be.eql(119);
+
+            data.installments.should.be.a.String;
 
             done();
         });
@@ -56,7 +59,11 @@ describe('Node e-commerce scraper', function () {
             },
             name: 'h1.base-title',
             description: 'div.product-description',
-            price: '.product-info-holder [itemprop="price"]'
+            price: '.product-info-holder [itemprop="price"]',
+            installments: {
+                selector: '.product-buy-wrapper .price-holder .parcel-price',
+                stripHtml: true
+            }
         };
 
         scraper.get(url, options, function (err, data, $) {
@@ -72,6 +79,8 @@ describe('Node e-commerce scraper', function () {
 
             data.price.should.be.a.Number;
             data.price.should.be.eql(239.9);
+
+            data.installments.should.be.a.String;
 
             done();
         });

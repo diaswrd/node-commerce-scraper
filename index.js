@@ -50,11 +50,13 @@ Scraper.prototype = {
             }
 
             _.each(options, function (o, key) {
-                var attribute = null;
                 var selector = o;
+                var attribute = null;
+                var stripHtml = false;
 
                 if (_.isObject(o)) {
                     attribute = o.attribute;
+                    stripHtml = o.stripHtml;
                     selector = o.selector;
                 }
 
@@ -65,14 +67,14 @@ Scraper.prototype = {
 
                     _.each($item, function (item) {
                         data[key].push(
-                            parseProductAttribute($(item), attribute, curr, decimal)
+                            parseProductAttribute($(item), attribute, stripHtml, curr, decimal)
                         );
                     }.bind(this));
 
                     return;
                 }
 
-                data[key] = parseProductAttribute($item, attribute, curr, decimal);
+                data[key] = parseProductAttribute($item, attribute, stripHtml, curr, decimal);
             }.bind(this));
 
             callback(null, data, $);
@@ -82,7 +84,7 @@ Scraper.prototype = {
 };
 
 // Private functions
-var parseProductAttribute = function ($item, attribute, currency, decimalMark) {
+var parseProductAttribute = function ($item, attribute, stripHtml, currency, decimalMark) {
     if (attribute) {
         return $item.attr(attribute);
     }
@@ -96,6 +98,11 @@ var parseProductAttribute = function ($item, attribute, currency, decimalMark) {
     }
 
     var text = _.trim($item.html());
+
+    if (stripHtml) {
+        text = _.trim($item.text());
+        return text;
+    }
 
     if (text.indexOf(currency) != -1) {
         var value = text.replace(currency, '').replace(decimalMark, '.');
